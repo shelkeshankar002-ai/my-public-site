@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#020b08">
+<title>PT7 H4X | UPI Payment</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 16px 12px;
+  background: #020b08;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  max-width: 900px;
+  margin: auto;
+  padding: 12px 4px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #00ff9940;
+}
+
+.brand {
+  color: #00ff99;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.tagline {
+  color: #aabbb2;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.green { color: #00ff99; }
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  margin: 26px auto;
+  padding: 24px 18px;
+  text-align: center;
+  border: 1px solid #00ff99;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #081b14, #030907);
+  box-shadow: 0 0 25px #00ff9915;
+}
+
+h1 { font-size: 27px; margin-bottom: 8px; }
+.subtitle { color: #aabbb2; font-size: 14px; }
+
+.qr-frame {
+  display: inline-block;
+  max-width: 100%;
+  margin: 20px auto;
+  padding: 9px;
+  border: 2px solid #00ff99;
+  border-radius: 14px;
+  background: white;
+}
+
+#qrImage {
+  display: block;
+  width: 270px;
+  max-width: 100%;
+  height: auto;
+}
+
+.upi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #007f52;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+  margin: 12px 0 18px;
+}
+
+button, input {
+  font: inherit;
+  border-radius: 10px;
+  padding: 13px;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid #00ff99;
+  background: transparent;
+  color: white;
+}
+
+button:hover { background: #00ff991c; }
+
+input {
+  width: 100%;
+  color: white;
+  background: #06110c;
+  border: 1px solid #007f52;
+  margin: 8px 0 14px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.primary {
+  background: #00ff99;
+  color: #00180e;
+  font-weight: bold;
+}
+
+.full { grid-column: 1 / -1; }
+
+.amount-label {
+  display: block;
+  text-align: left;
+  color: #00ff99;
+  font-size: 14px;
+}
+
+.details {
+  margin-top: 22px;
+  padding: 15px;
+  text-align: left;
+  border: 1px solid #075c40;
+  border-radius: 14px;
+}
+
+.details h3 { color: #00ff99; }
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #ffffff15;
+  font-size: 13px;
+}
+
+.detail-row:last-child { border: 0; }
+
+.detail-row span:last-child {
+  text-align: right;
+  color: #b9c9c0;
+  overflow-wrap: anywhere;
+}
+
+#status {
+  min-height: 18px;
+  margin-top: 14px;
+  color: #00ff99;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+footer {
+  text-align: center;
+  color: #9aafa4;
+  font-size: 12px;
+  line-height: 1.8;
+  padding: 10px;
+}
+
+@media (max-width: 360px) {
+  .card { padding: 20px 12px; }
+  h1 { font-size: 23px; }
+  #qrImage { width: 230px; }
+  button { padding: 12px 8px; font-size: 13px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div>
+    <div class="brand">⚡ PT7 H4X</div>
+    <div class="tagline">Simple • Fast • Easy</div>
+  </div>
+  <div class="green">SCAN & PAY</div>
+</header>
+
+<main class="card">
+  <h1>UPI <span class="green">Payment</span></h1>
+  <p class="subtitle">Scan this QR code or pay using a UPI app</p>
+
+  <div class="qr-frame">
+    <img id="qrImage" src="myqr.png"
+         alt="UPI QR Code">
+  </div>
+
+  <div class="upi">
+    <span id="upiText">morganh4x@ybl</span>
+    <button type="button" onclick="copyUPI()">Copy ID</button>
+  </div>
+
+  <label class="amount-label" for="amount">
+    Payment Amount (₹)
+  </label>
+
+  <input id="amount" type="number" min="1"
+         max="100000" step="1"
+         placeholder="Enter amount (optional)">
+
+  <div class="buttons">
+    <button class="primary full" onclick="payNow()">
+      ₹ Pay Now
+    </button>
+    <button onclick="downloadQR()">↓ Download QR</button>
+    <button onclick="sharePage()">↗ Share</button>
+    <button class="full" onclick="copyUPI()">
+      ▣ Copy UPI ID
+    </button>
+  </div>
+<div id="status" role="status"></div>
+
+  <div class="details">
+    <h3>▣ Payment Details</h3>
+    <div class="detail-row">
+      <span>UPI ID</span>
+      <span>morganh4x@ybl</span>
+    </div>
+    <div class="detail-row">
+      <span>Payment method</span>
+      <span>UPI app</span>
+    </div>
+    <div class="detail-row">
+      <span>Payment status</span>
+      <span>Not verified here</span>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Personal UPI payment page<br>
+  <span class="green">PT7 H4X</span> • Scan & Pay
+</footer>
+
+<script>
+const UPI_ID = "morganh4x@ybl";
+const PAYEE_NAME = "PT7 H4X";
+
+function message(text) {
+  document.getElementById("status").textContent = text;
+}
+
+async function copyUPI() {
+  try {
+    await navigator.clipboard.writeText(UPI_ID);
+    message("UPI ID copied successfully!");
+  } catch (e) {
+    const field = document.createElement("textarea");
+    field.value = UPI_ID;
+    document.body.appendChild(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+
+    message(copied
+      ? "UPI ID copied!"
+      : "Please copy: " + UPI_ID);
+  }
+}
+
+function payNow() {
+  const amountInput =
+    document.getElementById("amount").value.trim();
+  const amount = Number(amountInput);
+
+  if (amountInput !== "" &&
+      (!Number.isFinite(amount) ||
+       amount < 1 || amount > 100000)) {
+    message("Enter an amount between ₹1 and ₹100000.");
+    return;
+  }
+
+  const params = new URLSearchParams({
+    pa: UPI_ID,
+    pn: PAYEE_NAME,
+    cu: "INR"
+  });
+
+  if (amountInput !== "") {
+    params.set("am", amount.toFixed(2));
+  }
+
+  window.location.href = "upi://pay?" + params.toString();
+}
+
+async function downloadQR() {
+  const img = document.getElementById("qrImage");
+
+  if (!img.complete || !img.naturalWidth) {
+    message("QR image not found. Upload myqr.png to GitHub.");
+    return;
+  }
+
+  try {
+    const response = await fetch(img.src);
+    if (!response.ok) throw new Error("Download failed");
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "PT7-H4X-UPI-QR.png";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    message("QR download started!");
+  } catch (e) {
+    // Fallback for browsers that block image fetching.
+    window.open(img.src, "_blank");
+    message("QR opened. Use browser menu to download it.");
+  }
+}
+
+async function sharePage() {
+  const data = {
+    title: "PT7 H4X UPI Payment",
+    text: "UPI ID: " + UPI_ID,
+    url: window.location.href
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(data);
+    } else {
+      await navigator.clipboard.writeText(
+        window.location.href
+      );
+      message("Website link copied!");
+    }
+  } catch (e) {
+    if (e.name !== "AbortError") {
+      message("Unable to share right now.");
+    }
+  }
+}
+</script>
+
+</body>
+</html>
