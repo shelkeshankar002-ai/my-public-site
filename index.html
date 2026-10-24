@@ -196,8 +196,8 @@ footer {
   <p class="subtitle">Scan this QR code or pay using a UPI app</p>
 
   <div class="qr-frame">
-    <!-- Keep your ORIGINAL PhonePe QR image in this folder -->
-    <img id="qrImage" src="myqr.png" alt="UPI QR Code">
+    <img id="qrImage" src="myqr.png"
+         alt="UPI QR Code">
   </div>
 
   <div class="upi">
@@ -205,28 +205,39 @@ footer {
     <button type="button" onclick="copyUPI()">Copy ID</button>
   </div>
 
-  <label class="amount-label" for="amount">Payment Amount (₹)</label>
-  <input id="amount" type="number" min="1" max="100000" step="1"
+  <label class="amount-label" for="amount">
+    Payment Amount (₹)
+  </label>
+
+  <input id="amount" type="number" min="1"
+         max="100000" step="1"
          placeholder="Enter amount (optional)">
 
   <div class="buttons">
-    <button class="primary full" onclick="payNow()">₹ Pay Now</button>
+    <button class="primary full" onclick="payNow()">
+      ₹ Pay Now
+    </button>
     <button onclick="downloadQR()">↓ Download QR</button>
     <button onclick="sharePage()">↗ Share</button>
-    <button class="full" onclick="copyUPI()">▣ Copy UPI ID</button>
+    <button class="full" onclick="copyUPI()">
+      ▣ Copy UPI ID
+    </button>
   </div>
-<div id="status" role="status"></div>
+  <div id="status" role="status"></div>
 
   <div class="details">
     <h3>▣ Payment Details</h3>
     <div class="detail-row">
-      <span>UPI ID</span><span>morganh4x@ybl</span>
+      <span>UPI ID</span>
+      <span>morganh4x@ybl</span>
     </div>
     <div class="detail-row">
-      <span>Payment method</span><span>UPI app</span>
+      <span>Payment method</span>
+      <span>UPI app</span>
     </div>
     <div class="detail-row">
-      <span>Payment status</span><span>Not verified here</span>
+      <span>Payment status</span>
+      <span>Not verified here</span>
     </div>
   </div>
 </main>
@@ -255,19 +266,22 @@ async function copyUPI() {
     field.select();
     const copied = document.execCommand("copy");
     field.remove();
-    message(copied ? "UPI ID copied!" : "Please copy: " + UPI_ID);
+
+    message(copied
+      ? "UPI ID copied!"
+      : "Please copy: " + UPI_ID);
   }
 }
 
 function payNow() {
-  const amountInput = document.getElementById("amount").value.trim();
+  const amountInput =
+    document.getElementById("amount").value.trim();
   const amount = Number(amountInput);
 
   if (amountInput !== "" &&
-   (!Number.isFinite(amount) ||
- amount < 1 ||
- amount > 100000)   ) {
-    message("Please enter a valid amount between ₹1 and ₹100000.");
+      (!Number.isFinite(amount) ||
+       amount < 1 || amount > 100000)) {
+    message("Enter an amount between ₹1 and ₹100000.");
     return;
   }
 
@@ -281,85 +295,60 @@ function payNow() {
     params.set("am", amount.toFixed(2));
   }
 
-  // Opens the device's supported UPI payment handler.
-  // It does not confirm payment or guarantee PhonePe specifically.
   window.location.href = "upi://pay?" + params.toString();
-  message("If no payment app opens, scan the QR or copy the UPI ID.");
 }
 
-function async function downloadQR() {
+async function downloadQR() {
   const img = document.getElementById("qrImage");
 
-  if (!img.complete || img.naturalWidth === 0) {
-    message("QR image load zala nahi. myqr.png file check kara.");
+  if (!img.complete || !img.naturalWidth) {
+    message("QR image not found. Upload myqr.png to GitHub.");
     return;
   }
 
   try {
     const response = await fetch(img.src);
-
-    if (!response.ok) {
-      throw new Error("Image download failed");
-    }
+    if (!response.ok) throw new Error("Download failed");
 
     const blob = await response.blob();
-    const objectURL = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
-    link.href = objectURL;
+    link.href = url;
     link.download = "PT7-H4X-UPI-QR.png";
     document.body.appendChild(link);
     link.click();
     link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(objectURL), 2000);
-    message("QR download suru zala!");
-  } catch (error) {
-    // Fallback for browsers where fetch/blob is unavailable.
-    const link = document.createElement("a");
-    link.href = img.src;
-    link.download = "PT7-H4X-UPI-QR.png";
-    link.target = "_blank";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    message("Download nahi zalyas QR image ughadun Save Image kara.");
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    message("QR download started!");
+  } catch (e) {
+    // Fallback for browsers that block image fetching.
+    window.open(img.src, "_blank");
+    message("QR opened. Use browser menu to download it.");
   }
-} {
-  const img = document.getElementById("qrImage");
-
-  if (!img.complete || img.naturalWidth === 0) {
-    message("QR image missing. Put your original QR image beside index.html.");
-    return;
-  }
-
-  const link = document.createElement("a");
-  link.href = img.src;
-  link.download = "PT7-H4X-UPI-QR.png";
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
 }
 
 async function sharePage() {
-  const shareData = {
+  const data = {
     title: "PT7 H4X UPI Payment",
-    text: "UPI ID: " + UPI_ID + " — Scan the QR code to pay.",
+    text: "UPI ID: " + UPI_ID,
     url: window.location.href
   };
 
   try {
     if (navigator.share) {
-      await navigator.share(shareData);
-    } else if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(window.location.href);
-      message("Page link copied. Share it with others!");
+      await navigator.share(data);
     } else {
-      message("Copy the website link from your browser to share.");
+      await navigator.clipboard.writeText(
+        window.location.href
+      );
+      message("Website link copied!");
     }
   } catch (e) {
-    if (e.name !== "AbortError") message("Unable to share right now.");
+    if (e.name !== "AbortError") {
+      message("Unable to share right now.");
+    }
   }
 }
 </script>
